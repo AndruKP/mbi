@@ -8,5 +8,5 @@
 #include "Tree.h"
 
 
-long double felsenstein(Tree t, long double alpha, std::map<std::string, Base>);
+probability felsenstein(Tree t, probability alpha, const std::map<std::string, Base> &alignment_col);
 

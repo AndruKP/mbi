@@ -4,7 +4,7 @@
 
 #include "Tree.h"
 
-void Node::add_child(Node *child, const long double distance) {
+void Node::add_child(Node *child, branchLength distance) {
     if (left == nullptr) {
         left = child;
         left_child_distance = distance;
@@ -16,12 +16,63 @@ void Node::add_child(Node *child, const long double distance) {
     }
 }
 
-long double Tree::jukes_cantor_probability(const Base from, const Base to,
-                                           const long double alpha, const long double t) {
+bool Node::isLeaf() const {
+    return left == nullptr && right == nullptr;
+}
+
+std::vector<Node *> Node::get_leaves() {
+    if (isLeaf()) {
+        return {this};
+    }
+    std::vector<Node *> l, r;
+    if (left != nullptr) {
+        l = left->get_leaves();
+    }
+    if (right != nullptr) {
+        r = right->get_leaves();
+    }
+    l.insert(l.end(), r.begin(), r.end());
+    return l;
+}
+
+std::vector<Node *> Node::get_postorder() {
+    std::vector<Node *> l, r;
+    if (left != nullptr) {
+        l = left->get_postorder();
+    }
+    if (right != nullptr) {
+        r = right->get_postorder();
+    }
+    l.insert(l.end(), r.begin(), r.end());
+    l.insert(l.end(), {this});
+    return l;
+}
+
+probability Tree::jukes_cantor_probability(const Base from, const Base to,
+                                           const probability alpha, const branchLength t) {
     if (from == to) {
         return (1 + 3 * std::exp(-4.0 / 3.0 * alpha * t)) / 4.0;
     }
-    return 1 - std::exp(-4.0 / 3.0 * alpha * t);
+    return (1 - std::exp(-4.0 / 3.0 * alpha * t)) / 4.0;
+}
+
+void Tree::set_leaves_bases(std::map<std::string, Base> alignment_col) const {
+    const auto leaves = get_leaves();
+    for (const auto leaf: leaves) {
+        leaf->base = alignment_col.at(leaf->name);
+        alignment_col.erase(leaf->name);
+    }
+    if (!alignment_col.empty()) {
+        throw std::logic_error("Some alignment's columns aren't used");
+    }
+}
+
+std::vector<Node *> Tree::get_leaves() const {
+    return root->get_leaves();
+}
+
+std::vector<Node *> Tree::get_postorder() const {
+    return root->get_postorder();
 }
 
 std::istream &operator>>(std::istream &is, Tree &tree) {
@@ -36,7 +87,7 @@ std::istream &operator>>(std::istream &is, Tree &tree) {
 
         std::istringstream iss(line);
         std::string child_name, parent_name;
-        long double dist;
+        branchLength dist;
         iss >> child_name >> parent_name >> dist;
 
         if (!nodes.contains(parent_name)) {
