@@ -4,6 +4,6 @@
 
 #include "felsenstein.h"
 
-long double felsenstein(Tree t, long double alpha, std::map<std::string, base>) {
+long double felsenstein(Tree t, long double alpha, std::map<std::string, Base>) {
     return 0.0;
 }

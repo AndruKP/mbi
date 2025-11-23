@@ -7,9 +7,6 @@
 #include <string>
 #include "Tree.h"
 
-#ifndef DU02_FELSENSTEIN_H
-#define DU02_FELSENSTEIN_H
 
-long double felsenstein(Tree t, long double alpha, std::map<std::string, base>);
+long double felsenstein(Tree t, long double alpha, std::map<std::string, Base>);
 
-#endif //DU02_FELSENSTEIN_H
