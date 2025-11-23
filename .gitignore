@@ -1,3 +1,7 @@
 *.fasta
 *.fa
-.idea
+*.txt
+*.pdf
+
+*cmake*
+*.idea
