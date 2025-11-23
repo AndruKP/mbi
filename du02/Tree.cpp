@@ -4,7 +4,14 @@
 
 #include "Tree.h"
 
-void Node::add_child(Node *child, branchLength distance) {
+Base get_base(const char c) {
+    if (!CHAR_TO_BASE.contains(c)) {
+        throw std::logic_error("Wrong base character");
+    }
+    return CHAR_TO_BASE.at(c);
+}
+
+void Node::add_child(Node *child, const branchLength distance) {
     if (left == nullptr) {
         left = child;
         left_child_distance = distance;

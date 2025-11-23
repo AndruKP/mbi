@@ -46,3 +46,36 @@ probability felsenstein(const Tree t, const probability alpha, const std::map<st
     }
     return result;
 }
+
+log_prob sequence_alignment_felsenstein(const Tree t, const probability alpha, const alignment &a) {
+    log_prob result = 0;
+
+    for (unsigned long i = 0; i < a.seq_length(); i++) {
+        if (i % 1000 == 0) {
+            std::cout << i << std::endl;
+        }
+        std::map<std::string, Base> one_base_alignment;
+        for (auto &[name, seq]: a.get_map()) {
+            one_base_alignment[name] = get_base(seq[i]);
+        }
+        result += std::log(felsenstein(t, alpha, one_base_alignment));
+    }
+    return result;
+}
+
+probability get_optimal_alpha(const Tree t, const alignment &a) {
+    log_prob max_log_prob = 0;
+    probability max_arg_alpha = 0;
+    for (int iter = 1; iter <= 20; iter++) {
+        std::cout << iter << std::endl;
+
+        const probability alpha = iter / 10.0;
+        const log_prob curr_lp = sequence_alignment_felsenstein(t, alpha, a);
+
+        if (max_arg_alpha == 0 || max_log_prob < curr_lp) {
+            max_log_prob = curr_lp;
+            max_arg_alpha = alpha;
+        }
+    }
+    return max_arg_alpha;
+}

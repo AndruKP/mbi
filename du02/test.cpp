@@ -55,9 +55,23 @@ void test_b() {
     std::cout << "value for alpha = 2 is " << probability_02 << std::endl;
 }
 
+void test_c() {
+    std::cout << "TEST C" << std::endl;
+    const std::string ALIGNMENT_FILENAME = "cftr.txt";
+    const std::string TREE_FILENAME = "tree.txt";
+
+    alignment a;
+    Tree t;
+    std::fstream(ALIGNMENT_FILENAME) >> a;
+    std::fstream(TREE_FILENAME) >> t;
+
+    std::cout << get_optimal_alpha(t, a);
+}
+
 int main() {
     test_0();
     test_a();
     test_b();
+    test_c();
     return 0;
 }

@@ -16,10 +16,15 @@
 const std::string ROOT_NAME = "Root";
 
 typedef long double probability;
+typedef long double log_prob;
 typedef long double branchLength;
 
-// None is used for non-leaf nodes as NONE state, N used as an unknown base
+// NONE is used for non-leaf nodes as NONE state, N used as an unknown base
 enum Base { A, C, G, T, N, NONE };
+
+const std::map<char, Base> CHAR_TO_BASE = {{'A', A}, {'C', C}, {'T', T}, {'G', G}, {'N', N}, {'-', N}};
+
+Base get_base(char c);
 
 class NodeException : std::logic_error {
 public:
@@ -54,7 +59,7 @@ public:
 
     void add_child(Node *child, branchLength distance);
 
-    bool isLeaf() const;
+    [[nodiscard]] bool isLeaf() const;
 
     std::vector<Node *> get_leaves();
 
@@ -77,9 +82,9 @@ public:
 
     void set_leaves_bases(std::map<std::string, Base> alignment_col) const;
 
-    std::vector<Node *> get_leaves() const;
+    [[nodiscard]] std::vector<Node *> get_leaves() const;
 
-    std::vector<Node *> get_postorder() const;
+    [[nodiscard]] std::vector<Node *> get_postorder() const;
 };
 
 
