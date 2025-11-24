@@ -27,9 +27,8 @@ void test_a() {
     const auto root = new Node(nullptr, left, right, 1, 1, "root", NONE);
 
     t.set_root(root);
-    t.precalculate_jd69_matrix(1);
 
-    const auto probability = felsenstein(t, 1, {{"left", A}, {"right", A}});
+    const auto probability = single_col_felsenstein(t, 1, {{"left", A}, {"right", A}});
     std::cout << probability << std::endl;
     std::cout << "should be around " << 0.0755281471042753 << std::endl;
 
@@ -50,8 +49,8 @@ void test_b() {
     for (const auto leaf: t.get_leaves()) {
         m[leaf->name] = BASE_TO_TEST_B;
     }
-    const probability probability_1 = felsenstein(t, 1, m);
-    const probability probability_02 = felsenstein(t, 0.2, m);
+    const probability probability_1 = single_col_felsenstein(t, 1, m);
+    const probability probability_02 = single_col_felsenstein(t, 0.2, m);
     std::cout << "value for alpha = 1 is " << probability_1 << std::endl;
     std::cout << "value for alpha = 2 is " << probability_02 << std::endl;
 }

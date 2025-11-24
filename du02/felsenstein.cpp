@@ -10,12 +10,11 @@ const std::map<const Base, probability> BASE_FREQUENCIES = {
 };
 
 
-probability felsenstein(const Tree t, const probability alpha, const std::map<std::string, Base> &alignment_col) {
+probability felsenstein(const Tree t, const std::map<std::string, Base> &alignment_col) {
     t.set_leaves_bases(alignment_col);
     std::map<std::pair<const Node *, Base>, probability> A;
 
     const auto order = t.get_postorder();
-    const std::vector bases = {Base::A, Base::C, Base::G, Base::T};
 
     for (const auto &vertex: order) {
         for (unsigned int first_base_idx = 0; first_base_idx < NUM_BASES; first_base_idx++) {
@@ -41,13 +40,19 @@ probability felsenstein(const Tree t, const probability alpha, const std::map<st
     }
     probability result = 0;
     const Node *root = t.get_root();
-    for (auto &base: bases) {
+    for (auto &base: BASES) {
         result += BASE_FREQUENCIES.at(base) * A.at({root, base});
     }
     return result;
 }
 
-log_prob sequence_alignment_felsenstein(const Tree t, const probability alpha, const alignment &a) {
+probability single_col_felsenstein(const Tree t, const probability alpha,
+                                   const std::map<std::string, Base> &alignment_col) {
+    t.precalculate_jd69_matrix(alpha);
+    return felsenstein(t, alignment_col);
+}
+
+log_prob sequence_alignment_felsenstein(const Tree t, const alignment &a) {
     log_prob result = 0;
 
     auto m = a.get_map();
@@ -59,7 +64,7 @@ log_prob sequence_alignment_felsenstein(const Tree t, const probability alpha, c
         for (auto &[name, seq]: m) {
             one_base_alignment[name] = get_base(seq[i]);
         }
-        result += std::log(felsenstein(t, alpha, one_base_alignment));
+        result += std::log(felsenstein(t, one_base_alignment));
     }
     return result;
 }
@@ -72,7 +77,7 @@ probability get_optimal_alpha(const Tree t, const alignment &a) {
 
         const probability alpha = iter / 10.0;
         t.precalculate_jd69_matrix(alpha);
-        const log_prob curr_lp = sequence_alignment_felsenstein(t, alpha, a);
+        const log_prob curr_lp = sequence_alignment_felsenstein(t, a);
 
         if (max_arg_alpha == 0 || max_log_prob < curr_lp) {
             max_log_prob = curr_lp;
