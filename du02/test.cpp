@@ -27,6 +27,7 @@ void test_a() {
     const auto root = new Node(nullptr, left, right, 1, 1, "root", NONE);
 
     t.set_root(root);
+    t.precalculate_jd69_matrix(1);
 
     const auto probability = felsenstein(t, 1, {{"left", A}, {"right", A}});
     std::cout << probability << std::endl;

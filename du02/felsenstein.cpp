@@ -18,7 +18,8 @@ probability felsenstein(const Tree t, const probability alpha, const std::map<st
     const std::vector bases = {Base::A, Base::C, Base::G, Base::T};
 
     for (const auto &vertex: order) {
-        for (auto base: bases) {
+        for (unsigned int first_base_idx = 0; first_base_idx < NUM_BASES; first_base_idx++) {
+            auto base = BASES[first_base_idx];
             if (vertex->isLeaf()) {
                 if (vertex->base == N) {
                     A[{vertex, base}] = PROBABILITY_UNKNOWN_LEAF;
@@ -30,11 +31,10 @@ probability felsenstein(const Tree t, const probability alpha, const std::map<st
             probability prob_left = 0, prob_right = 0;
             auto left_node = vertex->left;
             auto right_node = vertex->right;
-            for (const auto &sum_base: bases) {
-                prob_left += A[{left_node, sum_base}] * Tree::jukes_cantor_probability(
-                    base, sum_base, alpha, vertex->left_child_distance);
-                prob_right += A[{right_node, sum_base}] * Tree::jukes_cantor_probability(
-                    base, sum_base, alpha, vertex->right_child_distance);;
+            for (unsigned int second_base_idx = 0; second_base_idx < NUM_BASES; second_base_idx++) {
+                auto sum_base = BASES[second_base_idx];
+                prob_left += A[{left_node, sum_base}] * vertex->left_child_matrix[first_base_idx][second_base_idx];
+                prob_right += A[{right_node, sum_base}] * vertex->right_child_matrix[first_base_idx][second_base_idx];
             }
             A[{vertex, base}] = prob_left * prob_right;
         }
@@ -71,6 +71,7 @@ probability get_optimal_alpha(const Tree t, const alignment &a) {
         std::cout << iter << std::endl;
 
         const probability alpha = iter / 10.0;
+        t.precalculate_jd69_matrix(alpha);
         const log_prob curr_lp = sequence_alignment_felsenstein(t, alpha, a);
 
         if (max_arg_alpha == 0 || max_log_prob < curr_lp) {

@@ -4,6 +4,7 @@
 #pragma once
 
 
+#include <array>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -21,6 +22,8 @@ typedef long double branchLength;
 
 // NONE is used for non-leaf nodes as NONE state, N used as an unknown base
 enum Base { A, C, G, T, N, NONE };
+const std::vector BASES = {A,C,G,T};
+constexpr unsigned int NUM_BASES = 4;
 
 const std::map<char, Base> CHAR_TO_BASE = {{'A', A}, {'C', C}, {'T', T}, {'G', G}, {'N', N}, {'-', N}};
 
@@ -44,6 +47,9 @@ public:
     std::string name;
     Base base = NONE;
 
+    std::array<std::array<probability, 4>, 4> left_child_matrix;
+    std::array<std::array<probability, 4>, 4> right_child_matrix;
+
     Node(Node *par, Node *l, Node *r,
          const branchLength lcd, const branchLength rcd, std::string name, const Base b) : parent(par), left(l),
         right(r),
@@ -64,6 +70,8 @@ public:
     std::vector<Node *> get_leaves();
 
     std::vector<Node *> get_postorder();
+
+    void precalculate_jd69_matrix(probability alpha);
 };
 
 class Tree {
@@ -77,6 +85,8 @@ public:
     [[nodiscard]] Node *get_root() const {
         return root;
     }
+
+    void precalculate_jd69_matrix(probability alpha) const;
 
     static probability jukes_cantor_probability(Base from, Base to, probability alpha, branchLength t);
 
