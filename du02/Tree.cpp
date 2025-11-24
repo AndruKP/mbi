@@ -63,6 +63,12 @@ void Node::precalculate_jd69_matrix(const probability alpha) {
             right_child_matrix[i][j] = Tree::jukes_cantor_probability(BASES[i], BASES[j], alpha, right_child_distance);
         }
     }
+    if (left != nullptr) {
+        left->precalculate_jd69_matrix(alpha);
+    }
+    if (right != nullptr) {
+        right->precalculate_jd69_matrix(alpha);
+    }
 }
 
 void Tree::precalculate_jd69_matrix(const probability alpha) const {
