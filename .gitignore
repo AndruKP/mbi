@@ -3,5 +3,5 @@
 *.txt
 *.pdf
 
-*cmake*
+*cmake-build*
 *.idea
