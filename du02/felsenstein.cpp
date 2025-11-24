@@ -50,12 +50,13 @@ probability felsenstein(const Tree t, const probability alpha, const std::map<st
 log_prob sequence_alignment_felsenstein(const Tree t, const probability alpha, const alignment &a) {
     log_prob result = 0;
 
+    auto m = a.get_map();
     for (unsigned long i = 0; i < a.seq_length(); i++) {
         if (i % 1000 == 0) {
             std::cout << i << std::endl;
         }
         std::map<std::string, Base> one_base_alignment;
-        for (auto &[name, seq]: a.get_map()) {
+        for (auto &[name, seq]: m) {
             one_base_alignment[name] = get_base(seq[i]);
         }
         result += std::log(felsenstein(t, alpha, one_base_alignment));
