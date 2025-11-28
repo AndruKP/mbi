@@ -4,15 +4,27 @@
 
 #include "felsenstein.h"
 
+#include <unordered_map>
+
 constexpr probability PROBABILITY_UNKNOWN_LEAF = 1;
 const std::map<const Base, probability> BASE_FREQUENCIES = {
     {A, 1.0 / 4.0}, {C, 1.0 / 4.0}, {G, 1.0 / 4.0}, {T, 1.0 / 4.0}
 };
 
+struct felsHash {
+    std::size_t operator()(const std::pair<const Node*, const Base>& key) const noexcept {
+        const std::size_t h1 = std::hash<const Node*>{}(key.first);
+        const std::size_t h2 = std::hash<std::underlying_type_t<Base>>{}(key.second);
+
+        return h1 ^ h2; //+ 0x9e3779b97f4a7c15ULL + (h1 << 6) + (h1 >> 2);
+    }
+};
+
+
 
 probability felsenstein(const Tree t, const std::map<std::string, Base> &alignment_col) {
     t.set_leaves_bases(alignment_col);
-    std::map<std::pair<const Node *, Base>, probability> A;
+    std::unordered_map<std::pair<const Node *, Base>, probability, felsHash> A;
 
     const auto order = t.get_postorder();
 
@@ -41,7 +53,7 @@ probability felsenstein(const Tree t, const std::map<std::string, Base> &alignme
     probability result = 0;
     const Node *root = t.get_root();
     for (auto &base: BASES) {
-        result += BASE_FREQUENCIES.at(base) * A.at({root, base});
+        result += BASE_FREQUENCIES.at(base) * A[{root, base}];
     }
     return result;
 }
@@ -57,7 +69,7 @@ log_prob sequence_alignment_felsenstein(const Tree t, const alignment &a) {
 
     auto m = a.get_map();
     for (unsigned long i = 0; i < a.seq_length(); i++) {
-        if (i % 1000 == 0) {
+        if (DEBUG && i % 1000 == 0) {
             std::cout << i << std::endl;
         }
         std::map<std::string, Base> one_base_alignment;
@@ -72,7 +84,9 @@ log_prob sequence_alignment_felsenstein(const Tree t, const alignment &a) {
 probability get_optimal_alpha(const Tree t, const alignment &a) {
     log_prob max_log_prob = 0;
     probability max_arg_alpha = 0;
-    for (int iter = 1; iter <= 20; iter++) {
+    // TODO: change to 20
+    constexpr int NUM_ITER = 1;
+    for (int iter = 1; iter <= NUM_ITER; iter++) {
         std::cout << iter << std::endl;
 
         const probability alpha = iter / 10.0;

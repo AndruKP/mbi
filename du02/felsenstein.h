@@ -8,6 +8,7 @@
 #include "Tree.h"
 #include "alignment.h"
 
+// TODO: change to false
 constexpr bool DEBUG = true;
 
 probability felsenstein(Tree t, const std::map<std::string, Base> &alignment_col);
