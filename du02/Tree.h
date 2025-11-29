@@ -79,6 +79,7 @@ public:
 
 class Tree {
     Node *root = nullptr;
+    std::vector<Node *> leaves;
 
 public:
     void set_root(Node *new_root) {
@@ -93,9 +94,9 @@ public:
 
     static probability jukes_cantor_probability(Base from, Base to, probability alpha, branchLength t);
 
-    void set_leaves_bases(std::map<std::string, Base> alignment_col) const;
+    void set_leaves_bases(std::map<std::string, Base> alignment_col);
 
-    [[nodiscard]] std::vector<Node *> get_leaves() const;
+    [[nodiscard]] std::vector<Node *> get_leaves();
 
     [[nodiscard]] std::vector<Node *> get_postorder() const;
 };

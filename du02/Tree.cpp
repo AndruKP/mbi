@@ -79,9 +79,8 @@ probability Tree::jukes_cantor_probability(const Base from, const Base to,
     return (1 - std::exp(-4.0 / 3.0 * alpha * t)) / 4.0;
 }
 
-void Tree::set_leaves_bases(std::map<std::string, Base> alignment_col) const {
-    const auto leaves = get_leaves();
-    for (const auto leaf: leaves) {
+void Tree::set_leaves_bases(std::map<std::string, Base> alignment_col) {
+    for (const auto leaf: get_leaves()) {
         leaf->base = alignment_col.at(leaf->name);
         alignment_col.erase(leaf->name);
     }
@@ -90,10 +89,11 @@ void Tree::set_leaves_bases(std::map<std::string, Base> alignment_col) const {
     }
 }
 
-std::vector<Node *> Tree::get_leaves() const {
-    std::vector<Node *> result;
-    root->get_leaves(result);
-    return result;
+std::vector<Node *> Tree::get_leaves() {
+    if (leaves.empty()) {
+        root->get_leaves(leaves);
+    }
+    return leaves;
 }
 
 std::vector<Node *> Tree::get_postorder() const {
