@@ -47,6 +47,7 @@ void Node::get_postorder(std::vector<Node *> &result) {
     if (right != nullptr) {
         right->get_postorder(result);
     }
+    idx = result.size();
     result.push_back(this);
 }
 

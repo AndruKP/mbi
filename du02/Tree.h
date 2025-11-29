@@ -48,6 +48,8 @@ public:
     std::string name;
     Base base = NONE;
 
+    size_t idx = 0;
+
     std::array<std::array<probability, 4>, 4> left_child_matrix;
     std::array<std::array<probability, 4>, 4> right_child_matrix;
 

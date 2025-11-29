@@ -11,31 +11,22 @@ const std::map<const Base, probability> BASE_FREQUENCIES = {
     {A, 1.0 / 4.0}, {C, 1.0 / 4.0}, {G, 1.0 / 4.0}, {T, 1.0 / 4.0}
 };
 
-struct felsHash {
-    std::size_t operator()(const std::pair<const Node*, const Base>& key) const noexcept {
-        const std::size_t h1 = std::hash<const Node*>{}(key.first);
-        const std::size_t h2 = std::hash<std::underlying_type_t<Base>>{}(key.second);
-
-        return h1 ^ h2; //+ 0x9e3779b97f4a7c15ULL + (h1 << 6) + (h1 >> 2);
-    }
-};
-
-
-
 probability felsenstein(const Tree &t, const std::map<std::string, Base> &alignment_col) {
     t.set_leaves_bases(alignment_col);
-    std::unordered_map<std::pair<const Node *, Base>, probability, felsHash> A;
 
     const auto order = t.get_postorder();
+    std::vector<std::array<probability, NUM_BASES> > A_new;
+    A_new.reserve(order.size());
 
-    for (const auto &vertex: order) {
+    for (auto vertex_idx = 0; vertex_idx < order.size(); vertex_idx++) {
         for (unsigned int first_base_idx = 0; first_base_idx < NUM_BASES; first_base_idx++) {
-            auto base = BASES[first_base_idx];
+            const auto base = BASES[first_base_idx];
+            const auto vertex = order[vertex_idx];
             if (vertex->isLeaf()) {
                 if (vertex->base == N) {
-                    A[{vertex, base}] = PROBABILITY_UNKNOWN_LEAF;
+                    A_new[vertex_idx][first_base_idx] = PROBABILITY_UNKNOWN_LEAF;
                 } else {
-                    A[{vertex, base}] = base == vertex->base;
+                    A_new[vertex_idx][first_base_idx] = base == vertex->base;
                 }
                 continue;
             }
@@ -43,17 +34,18 @@ probability felsenstein(const Tree &t, const std::map<std::string, Base> &alignm
             auto left_node = vertex->left;
             auto right_node = vertex->right;
             for (unsigned int second_base_idx = 0; second_base_idx < NUM_BASES; second_base_idx++) {
-                auto sum_base = BASES[second_base_idx];
-                prob_left += A[{left_node, sum_base}] * vertex->left_child_matrix[first_base_idx][second_base_idx];
-                prob_right += A[{right_node, sum_base}] * vertex->right_child_matrix[first_base_idx][second_base_idx];
+                prob_left += A_new[left_node->idx][second_base_idx] * vertex->left_child_matrix[first_base_idx][
+                    second_base_idx];
+                prob_right += A_new[right_node->idx][second_base_idx] * vertex->right_child_matrix[first_base_idx][
+                    second_base_idx];
             }
-            A[{vertex, base}] = prob_left * prob_right;
+            A_new[vertex_idx][first_base_idx] = prob_left * prob_right;
         }
     }
     probability result = 0;
     const Node *root = t.get_root();
     for (auto &base: BASES) {
-        result += BASE_FREQUENCIES.at(base) * A[{root, base}];
+        result += BASE_FREQUENCIES.at(base) * A_new[root->idx][base];
     }
     return result;
 }
