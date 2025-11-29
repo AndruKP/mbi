@@ -50,8 +50,8 @@ public:
 
     size_t idx = 0;
 
-    std::array<std::array<probability, 4>, 4> left_child_matrix;
-    std::array<std::array<probability, 4>, 4> right_child_matrix;
+    std::array<std::array<probability, NUM_BASES>, NUM_BASES> left_child_matrix = {};
+    std::array<std::array<probability, NUM_BASES>, NUM_BASES> right_child_matrix = {};
 
     Node(Node *par, Node *l, Node *r,
          const branchLength lcd, const branchLength rcd, std::string name, const Base b) : parent(par), left(l),

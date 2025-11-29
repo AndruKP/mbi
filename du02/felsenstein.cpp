@@ -15,37 +15,34 @@ probability felsenstein(const Tree &t, const std::map<std::string, Base> &alignm
     t.set_leaves_bases(alignment_col);
 
     const auto order = t.get_postorder();
-    std::vector<std::array<probability, NUM_BASES> > A_new;
-    A_new.reserve(order.size());
+    std::vector<std::array<probability, NUM_BASES> > dp_table;
+    dp_table.reserve(order.size());
 
     for (auto vertex_idx = 0; vertex_idx < order.size(); vertex_idx++) {
-        for (unsigned int first_base_idx = 0; first_base_idx < NUM_BASES; first_base_idx++) {
-            const auto base = BASES[first_base_idx];
+        for (const auto &base: BASES) {
             const auto vertex = order[vertex_idx];
             if (vertex->isLeaf()) {
                 if (vertex->base == N) {
-                    A_new[vertex_idx][first_base_idx] = PROBABILITY_UNKNOWN_LEAF;
+                    dp_table[vertex_idx][base] = PROBABILITY_UNKNOWN_LEAF;
                 } else {
-                    A_new[vertex_idx][first_base_idx] = base == vertex->base;
+                    dp_table[vertex_idx][base] = base == vertex->base;
                 }
                 continue;
             }
             probability prob_left = 0, prob_right = 0;
             auto left_node = vertex->left;
             auto right_node = vertex->right;
-            for (unsigned int second_base_idx = 0; second_base_idx < NUM_BASES; second_base_idx++) {
-                prob_left += A_new[left_node->idx][second_base_idx] * vertex->left_child_matrix[first_base_idx][
-                    second_base_idx];
-                prob_right += A_new[right_node->idx][second_base_idx] * vertex->right_child_matrix[first_base_idx][
-                    second_base_idx];
+            for (const auto &second_base: BASES) {
+                prob_left += dp_table[left_node->idx][second_base] * vertex->left_child_matrix[base][second_base];
+                prob_right += dp_table[right_node->idx][second_base] * vertex->right_child_matrix[base][second_base];
             }
-            A_new[vertex_idx][first_base_idx] = prob_left * prob_right;
+            dp_table[vertex_idx][base] = prob_left * prob_right;
         }
     }
     probability result = 0;
     const Node *root = t.get_root();
     for (auto &base: BASES) {
-        result += BASE_FREQUENCIES.at(base) * A_new[root->idx][base];
+        result += BASE_FREQUENCIES.at(base) * dp_table[root->idx][base];
     }
     return result;
 }

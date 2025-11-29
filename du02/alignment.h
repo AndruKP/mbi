@@ -21,7 +21,7 @@ public:
     [[nodiscard]] unsigned long seq_length() const { return length_; }
     [[nodiscard]] unsigned long length() const { return alignment_seq.size(); }
 
-    std::map<std::string, std::string> get_map() const;
+    [[nodiscard]] std::map<std::string, std::string> get_map() const;
 };
 
 std::istream &operator>>(std::istream &is, alignment &a);
