@@ -2,7 +2,7 @@
 // Created by andru_kfgnofp on 11/23/2025.
 //
 #pragma once
-#include "Tree.h"
+#include "tree.h"
 
 class alignment {
     unsigned long length_ = 0;
@@ -23,7 +23,7 @@ public:
 
     [[nodiscard]] std::map<std::string, std::string> get_map() const;
 
-    [[nodiscard]] std::vector<alignment> split_alignment(std::size_t interval_length) const ;
+    [[nodiscard]] std::vector<alignment> split_alignment(std::size_t interval_length) const;
 };
 
 std::istream &operator>>(std::istream &is, alignment &a);

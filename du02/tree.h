@@ -5,20 +5,20 @@
 
 
 #include <array>
+#include <cmath>
+#include <iostream>
+#include <map>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
-#include <iostream>
-#include <sstream>
-#include <cmath>
-#include <map>
 #include <vector>
 
 const std::string ROOT_NAME = "Root";
 
 typedef long double probability;
 typedef long double log_prob;
-typedef long double branchLength;
+typedef long double branch_length;
 
 // NONE is used for non-leaf nodes as NONE state, N used as an unknown base
 enum Base { A, C, G, T, N, NONE };
@@ -30,21 +30,21 @@ const std::map<char, Base> CHAR_TO_BASE = {{'A', A}, {'C', C}, {'T', T}, {'G', G
 
 Base get_base(char c);
 
-class NodeException : std::logic_error {
+class node_exception : std::logic_error {
 public:
-    NodeException(const std::string &what) : std::logic_error(what) {
+    node_exception(const std::string &what) : std::logic_error(what) {
     }
 };
 
-class Node {
+class node {
 public:
-    Node *parent = nullptr;
-    Node *left = nullptr;
-    Node *right = nullptr;
+    node *parent = nullptr;
+    node *left = nullptr;
+    node *right = nullptr;
 
     //Data
-    branchLength left_child_distance = 0;
-    branchLength right_child_distance = 0;
+    branch_length left_child_distance = 0;
+    branch_length right_child_distance = 0;
     std::string name;
     Base base = NONE;
 
@@ -53,53 +53,53 @@ public:
     std::array<std::array<probability, NUM_BASES>, NUM_BASES> left_child_matrix = {};
     std::array<std::array<probability, NUM_BASES>, NUM_BASES> right_child_matrix = {};
 
-    Node(Node *par, Node *l, Node *r,
-         const branchLength lcd, const branchLength rcd, std::string name, const Base b) : parent(par), left(l),
+    node(node *par, node *l, node *r,
+         const branch_length lcd, const branch_length rcd, std::string name, const Base b) : parent(par), left(l),
         right(r),
         left_child_distance(lcd),
         right_child_distance(rcd), name(std::move(name)),
         base(b) {
     }
 
-    explicit Node(std::string name) : name(std::move(name)) {
+    explicit node(std::string name) : name(std::move(name)) {
     }
 
-    Node() = default;
+    node() = default;
 
-    void add_child(Node *child, branchLength distance);
+    void add_child(node *child, branch_length distance);
 
-    [[nodiscard]] bool isLeaf() const;
+    [[nodiscard]] bool is_leaf() const;
 
-    void get_leaves(std::vector<Node *> &result);
+    void get_leaves(std::vector<node *> &result);
 
-    void get_postorder(std::vector<Node *> &result);
+    void get_postorder(std::vector<node *> &result);
 
     void precalculate_jd69_matrix(probability alpha);
 };
 
-class Tree {
-    Node *root = nullptr;
-    std::vector<Node *> leaves;
+class tree {
+    node *root = nullptr;
+    std::vector<node *> leaves;
 
 public:
-    void set_root(Node *new_root) {
+    void set_root(node *new_root) {
         root = new_root;
     }
 
-    [[nodiscard]] Node *get_root() const {
+    [[nodiscard]] node *get_root() const {
         return root;
     }
 
     void precalculate_jd69_matrix(probability alpha) const;
 
-    static probability jukes_cantor_probability(Base from, Base to, probability alpha, branchLength t);
+    static probability jukes_cantor_probability(Base from, Base to, probability alpha, branch_length t);
 
     void set_leaves_bases(std::map<std::string, Base> alignment_col);
 
-    [[nodiscard]] std::vector<Node *> get_leaves();
+    [[nodiscard]] std::vector<node *> get_leaves();
 
-    [[nodiscard]] std::vector<Node *> get_postorder() const;
+    [[nodiscard]] std::vector<node *> get_postorder() const;
 };
 
 
-std::istream &operator>>(std::istream &is, Tree &tree);
+std::istream &operator>>(std::istream &is, tree &tree);

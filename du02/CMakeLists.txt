@@ -7,8 +7,8 @@ set(CMAKE_CXX_FLAGS -O2)
 include_directories(.)
 
 set(SOURCE_FILES
-        Tree.cpp
-        Tree.h
+        tree.cpp
+        tree.h
         felsenstein.cpp
         felsenstein.h
         alignment.cpp
@@ -19,6 +19,6 @@ add_executable(test ${SOURCE_FILES} test.cpp)
 
 add_custom_command(TARGET test PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/tree.txt"
-                "${CMAKE_SOURCE_DIR}/cftr.txt"
+        "${CMAKE_SOURCE_DIR}/cftr.txt"
         $<TARGET_FILE_DIR:test>
         VERBATIM)

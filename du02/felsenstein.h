@@ -5,19 +5,17 @@
 
 #include <map>
 #include <string>
-#include "Tree.h"
+#include "tree.h"
 #include "alignment.h"
 
-// TODO: change to false
-constexpr bool DEBUG = true;
 
-probability felsenstein(Tree &t, const std::map<std::string, Base> &alignment_col);
+probability felsenstein(tree &t, const std::map<std::string, Base> &alignment_col);
 
-probability single_col_felsenstein(Tree &t, probability alpha, const std::map<std::string, Base> &alignment_col);
+probability single_col_felsenstein(tree &t, probability alpha, const std::map<std::string, Base> &alignment_col);
 
-log_prob sequence_alignment_felsenstein(Tree &t, const alignment &a, probability alpha);
+log_prob sequence_alignment_felsenstein(tree &t, const alignment &a, probability alpha);
 
-std::pair<log_prob, probability> get_optimal_alpha(Tree &t, const alignment &a);
+std::pair<log_prob, probability> get_optimal_alpha(tree &t, const alignment &a);
 
-std::vector<std::pair<log_prob, probability> > get_intervals_alphas(Tree &t, const alignment &a,
+std::vector<std::pair<log_prob, probability> > get_intervals_alphas(tree &t, const alignment &a,
                                                                     std::size_t interval_length);
