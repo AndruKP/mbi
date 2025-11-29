@@ -22,7 +22,8 @@ typedef long double branchLength;
 
 // NONE is used for non-leaf nodes as NONE state, N used as an unknown base
 enum Base { A, C, G, T, N, NONE };
-const std::vector BASES = {A,C,G,T};
+
+const std::vector BASES = {A, C, G, T};
 constexpr unsigned int NUM_BASES = 4;
 
 const std::map<char, Base> CHAR_TO_BASE = {{'A', A}, {'C', C}, {'T', T}, {'G', G}, {'N', N}, {'-', N}};
@@ -67,9 +68,9 @@ public:
 
     [[nodiscard]] bool isLeaf() const;
 
-    std::vector<Node *> get_leaves();
+    void get_leaves(std::vector<Node *> &result);
 
-    std::vector<Node *> get_postorder();
+    void get_postorder(std::vector<Node *> &result);
 
     void precalculate_jd69_matrix(probability alpha);
 };

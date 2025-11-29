@@ -27,38 +27,33 @@ bool Node::isLeaf() const {
     return left == nullptr && right == nullptr;
 }
 
-std::vector<Node *> Node::get_leaves() {
+void Node::get_leaves(std::vector<Node *> &result) {
     if (isLeaf()) {
-        return {this};
+        result.push_back({this});
+        return;
     }
-    std::vector<Node *> l, r;
     if (left != nullptr) {
-        l = left->get_leaves();
+        left->get_leaves(result);
     }
     if (right != nullptr) {
-        r = right->get_leaves();
+        right->get_leaves(result);
     }
-    l.insert(l.end(), r.begin(), r.end());
-    return l;
 }
 
-std::vector<Node *> Node::get_postorder() {
-    std::vector<Node *> l, r;
+void Node::get_postorder(std::vector<Node *> &result) {
     if (left != nullptr) {
-        l = left->get_postorder();
+        left->get_postorder(result);
     }
     if (right != nullptr) {
-        r = right->get_postorder();
+        right->get_postorder(result);
     }
-    l.insert(l.end(), r.begin(), r.end());
-    l.insert(l.end(), {this});
-    return l;
+    result.push_back(this);
 }
 
 void Node::precalculate_jd69_matrix(const probability alpha) {
     if (isLeaf()) return;
     for (unsigned int i = 0; i < NUM_BASES; i++) {
-        for (unsigned int j = 0; i < NUM_BASES; i++) {
+        for (unsigned int j = 0; j < NUM_BASES; j++) {
             left_child_matrix[i][j] = Tree::jukes_cantor_probability(BASES[i], BASES[j], alpha, left_child_distance);
             right_child_matrix[i][j] = Tree::jukes_cantor_probability(BASES[i], BASES[j], alpha, right_child_distance);
         }
@@ -95,11 +90,15 @@ void Tree::set_leaves_bases(std::map<std::string, Base> alignment_col) const {
 }
 
 std::vector<Node *> Tree::get_leaves() const {
-    return root->get_leaves();
+    std::vector<Node *> result;
+    root->get_leaves(result);
+    return result;
 }
 
 std::vector<Node *> Tree::get_postorder() const {
-    return root->get_postorder();
+    std::vector<Node *> result;
+    root->get_postorder(result);
+    return result;
 }
 
 std::istream &operator>>(std::istream &is, Tree &tree) {

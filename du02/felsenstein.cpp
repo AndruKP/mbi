@@ -22,7 +22,7 @@ struct felsHash {
 
 
 
-probability felsenstein(const Tree t, const std::map<std::string, Base> &alignment_col) {
+probability felsenstein(const Tree &t, const std::map<std::string, Base> &alignment_col) {
     t.set_leaves_bases(alignment_col);
     std::unordered_map<std::pair<const Node *, Base>, probability, felsHash> A;
 
@@ -58,13 +58,13 @@ probability felsenstein(const Tree t, const std::map<std::string, Base> &alignme
     return result;
 }
 
-probability single_col_felsenstein(const Tree t, const probability alpha,
+probability single_col_felsenstein(const Tree &t, const probability alpha,
                                    const std::map<std::string, Base> &alignment_col) {
     t.precalculate_jd69_matrix(alpha);
     return felsenstein(t, alignment_col);
 }
 
-log_prob sequence_alignment_felsenstein(const Tree t, const alignment &a) {
+log_prob sequence_alignment_felsenstein(const Tree &t, const alignment &a) {
     log_prob result = 0;
 
     auto m = a.get_map();
@@ -81,7 +81,7 @@ log_prob sequence_alignment_felsenstein(const Tree t, const alignment &a) {
     return result;
 }
 
-probability get_optimal_alpha(const Tree t, const alignment &a) {
+probability get_optimal_alpha(const Tree &t, const alignment &a) {
     log_prob max_log_prob = 0;
     probability max_arg_alpha = 0;
     // TODO: change to 20
