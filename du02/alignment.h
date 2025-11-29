@@ -22,6 +22,8 @@ public:
     [[nodiscard]] unsigned long length() const { return alignment_seq.size(); }
 
     [[nodiscard]] std::map<std::string, std::string> get_map() const;
+
+    [[nodiscard]] std::vector<alignment> split_alignment(std::size_t interval_length) const ;
 };
 
 std::istream &operator>>(std::istream &is, alignment &a);

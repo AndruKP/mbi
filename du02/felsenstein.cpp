@@ -71,13 +71,13 @@ log_prob sequence_alignment_felsenstein(Tree &t, const alignment &a, const proba
     return result;
 }
 
-probability get_optimal_alpha(Tree &t, const alignment &a) {
+std::pair<log_prob, probability> get_optimal_alpha(Tree &t, const alignment &a) {
     log_prob max_log_prob = 0;
     probability max_arg_alpha = 0;
     // TODO: change to 20
     constexpr int NUM_ITER = 20;
     for (int iter = 1; iter <= NUM_ITER; iter++) {
-        std::cout << iter << std::endl;
+        // std::cout << iter << std::endl;
 
         const probability alpha = iter / 10.0;
         const log_prob curr_lp = sequence_alignment_felsenstein(t, a, alpha);
@@ -87,5 +87,16 @@ probability get_optimal_alpha(Tree &t, const alignment &a) {
             max_arg_alpha = alpha;
         }
     }
-    return max_arg_alpha;
+    return {max_log_prob, max_arg_alpha};
+}
+
+std::vector<std::pair<log_prob, probability> > get_intervals_alphas(Tree &t, const alignment &a,
+                                                                    const std::size_t interval_length) {
+    const auto alignments = a.split_alignment(interval_length);
+    std::vector<std::pair<log_prob, probability> > results;
+    for (const auto &sub_alignment: alignments) {
+        std::cout << results.size() << std::endl;
+        results.push_back(get_optimal_alpha(t, sub_alignment));
+    }
+    return results;
 }

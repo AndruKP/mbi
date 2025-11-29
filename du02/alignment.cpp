@@ -8,6 +8,18 @@ std::map<std::string, std::string> alignment::get_map() const {
     return alignment_seq;
 }
 
+std::vector<alignment> alignment::split_alignment(const std::size_t interval_length) const{
+    std::vector<alignment> result;
+    for (std::size_t i = 0; i < seq_length(); i += interval_length) {
+        alignment sub;
+        for (const auto &[name, seq]: alignment_seq) {
+            sub.add_seq(name, seq.substr(i, interval_length));
+        }
+        result.push_back(sub);
+    }
+    return result;
+}
+
 std::istream &operator>>(std::istream &is, alignment &a) {
     std::string line;
 

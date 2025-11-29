@@ -65,7 +65,26 @@ void test_c() {
     std::fstream(ALIGNMENT_FILENAME) >> a;
     std::fstream(TREE_FILENAME) >> t;
 
-    std::cout << get_optimal_alpha(t, a);
+    auto [fst, snd] = get_optimal_alpha(t, a);
+    std::cout << fst << ' ' << snd;
+}
+
+void test_d() {
+    const std::string ALIGNMENT_FILENAME = "cftr.txt";
+    const std::string TREE_FILENAME = "tree.txt";
+    constexpr std::size_t INTERVAL_LENGTH = 100;
+
+    alignment a;
+    Tree t;
+    std::fstream(ALIGNMENT_FILENAME) >> a;
+    std::fstream(TREE_FILENAME) >> t;
+
+    auto result = get_intervals_alphas(t, a, INTERVAL_LENGTH);
+    for (std::size_t i = 0; i < result.size(); i++) {
+        const auto [fst, snd] = result[i];
+        std::cout << "columns: " << INTERVAL_LENGTH * i + 1 << ' ' << INTERVAL_LENGTH * (i + 1) << ' ' << fst << ' ' <<
+                snd << std::endl;
+    }
 }
 
 int main() {
@@ -73,5 +92,6 @@ int main() {
     test_a();
     test_b();
     test_c();
+    test_d();
     return 0;
 }

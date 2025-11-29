@@ -17,4 +17,7 @@ probability single_col_felsenstein(Tree &t, probability alpha, const std::map<st
 
 log_prob sequence_alignment_felsenstein(Tree &t, const alignment &a, probability alpha);
 
-probability get_optimal_alpha(Tree &t, const alignment &a);
+std::pair<log_prob, probability> get_optimal_alpha(Tree &t, const alignment &a);
+
+std::vector<std::pair<log_prob, probability> > get_intervals_alphas(Tree &t, const alignment &a,
+                                                                    std::size_t interval_length);
