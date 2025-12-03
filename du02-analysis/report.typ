@@ -11,13 +11,15 @@
 
 #set par(justify: true)
 #set text(
-  // font: "Droid Sans",
   size: 12pt,
 )
 
 #show title: set text(size: 17pt)
 #show title: set align(center)
 #show title: set block(below: 1.2em)
+
+#show link: set text(fill: blue)
+#show ref:  set text(fill: blue)
 
 #place(
   top + center,
@@ -30,8 +32,8 @@
   #grid(
     columns: (1fr),
     align(center)[
-      Denys Andrukhovskyi, 3BIN \
-      #link("mailto:andrukhovskyi1@uniba.sk")[#text(blue)[andrukhovskyi1\@uniba.sk]]
+      *Denys Andrukhovskyi*, 3BIN \
+      #link("mailto:andrukhovskyi1@uniba.sk")[andrukhovskyi1\@uniba.sk]
     ]
   )
 
@@ -41,7 +43,9 @@
 = C++ Implementation
 We use C++ to implement the algorithm. 
 Code is divided into several files:
-- `tree.h` and `tree.cpp` contain definitions of classes `tree` (phylogenetic rooted binary tree), `node` (main part of the `tree` class), `enum base` and some simple algorithms like getting postorder traversal of a tree;
+- `tree.h` and `tree.cpp` contain definitions of classes `tree` (phylogenetic rooted binary tree),
+`node` (main part of the `tree` class),
+`enum Base` and some simple algorithms like getting postorder traversal of a tree;
 - `alignment.h` and `alignment.cpp` contain definitions, that are used to define an alignment of multiple sequences; 
 - `felsenstein.h` and `felsenstein.cpp` contain main algorithm, as well as workarounds for task `c)` and `d)`;
 - `test.cpp` contain `main` function and functions for testing each substask.
@@ -49,14 +53,14 @@ Code is divided into several files:
 == Phylogenetic tree
 === Class `tree`
 We store rooted binary phylogenetic tree by using pointers paradigm: tree has a root, and we have pointer from each node to both children. 
-Instance of class `tree` has two member fields: `root`, which is a pointer to a root (of class `node`), and `leaves`, which is a `vector` of pointers corresponding to all leaves of a tree.
+Instance of class `tree` has two member fields: `root`, which is a pointer to the root (of class `node`), and `leaves`, which is a `vector` of pointers corresponding to all leaves of the tree.
 
 In tree class we define one important static function, which calculates probability according to Jukes-Cantor substition model.
 
 There is one unpleasant method: `set_leaves_bases`. 
 We call this method every time we select new column as our alignment. 
 There is a lot of overhead here, we can probably refactor this function into something better. 
-For reasoning see part #link(<eff>)[#text(blue)[Effectivness]].
+For reasoning see part #link(<eff>)[Effectivness].
 
 === Class `node`
 Instances of class `node` contain all information we need, each Instance has members for: 
@@ -67,25 +71,41 @@ Instances of class `node` contain all information we need, each Instance has mem
 - precalculated transtion matrix for JC69 substition model for both children;
 - internal index.
 
+Also there are important methods of class `node`: we implement postorder traversal to find leaves or the postorder, or to precalculate JC69.
+
+=== Class `alignment`
+Class `alignment` is used to store alignment of species (`std::map<std::string, std::string>` maps name to sequence).
+The only intersecting method there is `split_alignment`, which splits alignment into several `alignment` instances, so we can use it to solve _task d_.
+
 === Effectivness <eff>
 We are aware that probably if we'd use some other way to store the tree (e.g. storing tree as one array or in some different way use `std::vector<>` instead of pointers, so we save on cache allocations),
 we would achieve a much better performance.
 For example, method `set_leaves_bases` probably can be refactored, but refactoring probably would ruin the separation of code into methods, and we will get very effective spaghetti code: 
 passing bases without changing the vertices means we need to pass alignment each time directly to the `felsenstein` function, where we need to efffectively complete the task of identifying where each leaf leaves, to "set" the base to start our DP algorithm.
 That's probably doable, but not so pleasant.
-So we use this "ineffective" implementetion, and that's for 2 reasons:
+So we use this "ineffective" implementation, and that's for 2 reasons:
 + It's easier to read and change the code .
-+ By passing `-O2` parameter into GCC compiler, we effectively get the speed which is satisfactory for our purposes ($tilde 2$  minutes vs $tilde 20 op(minus) 40$ minutes to run all tasks `a,b,c,d`). Purely magic. #emoji.wand.
++ By passing `-O2` parameter into GCC compiler, we effectively get the speed which is satisfactory for our purposes ($tilde 2$  minutes vs $tilde 20 op(minus) 40$ minutes to run all tasks `a,b,c,d`). Pure magic.
 
 == Felsenstein's algorithm
 Felsenstein's algorithm is then implemented is `felsenstein.h` and `felsenstein.cpp`.
 We will highlight both C++ technicalities and algorithm details. 
 
-We start with setting bases for vertices.
-This operation in it's nonoptimized version can take a lot of time
+Main algorithm is implemented in `felsenstein` function, other functions are:
+- `single_col_felsenstein`; calculates probability for one column of alignment for some specific tree and alpha;
+- `sequence_alignment_felsenstein`; calculates probability for many columns of alignment for some specific tree and alpha;
+- `get_optimal_alpha`; gets optimal alpha for specific tree and alignment.
+- `get_intervals_alphas`; gets optimal alpha for each interval of a given length.
+
+Function `felsenstein` takes `tree &t` and `std::map<std::string, Base> &alignment_col`. 
+We start with setting bases at the leaves.
+After we create a DP table in form of `std::vector<std::array<probability, NUM_BASES> >`, i.e. vector with 4 arrays in it. 
+By doing so, we get that `dp_table[index][base]` corresponds to probability value of subtree with root `index` and base `base` in the root.
+After, we calculate `dp_table`, going from leaves to the root in the postorder order in a default way.
+We return sum of $sum_mono(b a s e) mono(d p \_ t a b l e [ r o o t][b a s e])$.
 
 = Answers to questions
-== Task a)
+_Task a_ is described above.
 
 == Task b)
 We calculated probability for $alpha = 1; alpha = 0.2$.
@@ -114,7 +134,7 @@ Values of $alpha$ for the first ten windows can be seen on the @t1.
   inset: 10pt,
   align: horizon,
   table.header(
-    [*Window*], [*Logarithm of \ probability*], [*Speed of \ evolution* $alpha$],
+    [*Window*], [Logarithm of \ probability], [*Speed of \ evolution* $alpha$],
   ),
   [1-100],  [$-379.05$],[$1$],
   [101-200],[$-425.57$],[$1.2$],
@@ -130,14 +150,38 @@ Values of $alpha$ for the first ten windows can be seen on the @t1.
 caption: "First ten windows"
 ) <t1>
 
-== Task e)
+== Tasks e) and f)
+
+We start with @dh, where we have both histograms. 
+For histogram of windows that are intersecting exons we see that it's shifted to the left (smaller alphas) than its non-intersecting counterpart, and surely these two distributions are different. 
+We assume that this is a consequence of biological nature of exons and introns: exons will mutate slower, because mutation in an exon has a 
+far higher probability to change the fenotype. 
+
+We statistically proved that this distributions are different. 
+Visualy we can also observe the difference on @cdf.
 
 #figure(
 image("combined_distribution.png"),
 caption: "Both distribution histograms"
-)
+) <dh>
 
 #figure(
 image("combined_cumulative_distribution.png"),
 caption: "Both cumulative distribution functions"
-)
+) <cdf>
+
+Distribution for non-intersecting regions resembles normal distribution at the first sight. 
+But if we plot a Q-Q plot (@qqplot), we can definitely see that tails are to small for normal distribution.
+Tests also show us p-value $0$.
+
+#figure(
+  image("non_intersect_qqplot.png"),
+  caption: "Q-Q plot of distribution of alpha value for windows that do not intersect "
+) <qqplot>
+
+= Appendix: how to reproduce the results
+Download `ctfr.txt, exons.txt, tree.txt` to the root folder of the project.
+Just compile with CMake all the files;
+copy output of the part d of C++ program to file `task_d.txt`.
+Then you can run `task_ef.ipynb` file. 
+Requirements can be found at `requirements.txt`.
