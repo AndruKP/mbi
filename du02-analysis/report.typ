@@ -43,9 +43,11 @@
 = C++ Implementation
 We use C++ to implement the algorithm. 
 Code is divided into several files:
-- `tree.h` and `tree.cpp` contain definitions of classes `tree` (phylogenetic rooted binary tree),
-`node` (main part of the `tree` class),
-`enum Base` and some simple algorithms like getting postorder traversal of a tree;
+- `tree.h` and `tree.cpp` contain definitions of classes:
+  - `tree` (phylogenetic rooted binary tree),
+  - `node` (main part of the `tree` class),
+  - `enum Base`
+  - some simple algorithms like getting postorder traversal of a tree;
 - `alignment.h` and `alignment.cpp` contain definitions, that are used to define an alignment of multiple sequences; 
 - `felsenstein.h` and `felsenstein.cpp` contain main algorithm, as well as workarounds for task `c)` and `d)`;
 - `test.cpp` contain `main` function and functions for testing each substask.
@@ -63,12 +65,12 @@ There is a lot of overhead here, we can probably refactor this function into som
 For reasoning see part #link(<eff>)[Effectivness].
 
 === Class `node`
-Instances of class `node` contain all information we need, each Instance has members for: 
+Instances of class `node` contain all information we need, each instance has members for: 
 - pointers to left and right child;
 - distance from it to each children;
 - name (of a taxon);
 - which base has this node (makes sense only for leaves);
-- precalculated transtion matrix for JC69 substition model for both children;
+- precalculated transition matrix for JC69 substition model for both children;
 - internal index.
 
 Also there are important methods of class `node`: we implement postorder traversal to find leaves or the postorder, or to precalculate JC69.
