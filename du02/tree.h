@@ -21,6 +21,7 @@ typedef long double log_prob;
 typedef long double branch_length;
 
 // NONE is used for non-leaf nodes as NONE state, N used as an unknown base
+// TODO: Base to base
 enum Base { A, C, G, T, N, NONE };
 
 const std::vector BASES = {A, C, G, T};
@@ -74,7 +75,7 @@ public:
 
     void get_postorder(std::vector<node *> &result);
 
-    void precalculate_jd69_matrix(probability alpha);
+    void precalculate_jc69_matrix(probability alpha);
 };
 
 class tree {

@@ -59,7 +59,7 @@ void test_b() {
     const probability probability_02 = single_col_felsenstein(t, 0.2, m);
 
     std::cout << "value for alpha = 1 is " << probability_1 << std::endl;
-    std::cout << "value for alpha = 2 is " << probability_02 << std::endl;
+    std::cout << "value for alpha = 0.2 is " << probability_02 << std::endl;
 }
 
 void test_c() {

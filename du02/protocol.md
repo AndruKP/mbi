@@ -1,5 +1,5 @@
 6000/min in the first place
-250000/min after changing to map in some other place
+250,000/min after changing to map in some other place
 
 ```
 0.1     Command being timed: "cmake-build-debug/test"

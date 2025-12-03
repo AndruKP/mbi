@@ -51,7 +51,7 @@ void node::get_postorder(std::vector<node *> &result) {
     result.push_back(this);
 }
 
-void node::precalculate_jd69_matrix(const probability alpha) {
+void node::precalculate_jc69_matrix(const probability alpha) {
     if (is_leaf()) return;
 
     for (unsigned int i = 0; i < NUM_BASES; i++) {
@@ -62,15 +62,15 @@ void node::precalculate_jd69_matrix(const probability alpha) {
     }
 
     if (left != nullptr) {
-        left->precalculate_jd69_matrix(alpha);
+        left->precalculate_jc69_matrix(alpha);
     }
     if (right != nullptr) {
-        right->precalculate_jd69_matrix(alpha);
+        right->precalculate_jc69_matrix(alpha);
     }
 }
 
 void tree::precalculate_jd69_matrix(const probability alpha) const {
-    root->precalculate_jd69_matrix(alpha);
+    root->precalculate_jc69_matrix(alpha);
 }
 
 probability tree::jukes_cantor_probability(const Base from, const Base to,
